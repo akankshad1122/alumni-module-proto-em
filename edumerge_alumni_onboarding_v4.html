@@ -1,0 +1,453 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  .proto-wrap { display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem; font-family: 'DM Sans', sans-serif; }
+  .screen-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-text-tertiary); margin-bottom: 1rem; }
+  .phone { width: 340px; min-height: 620px; background: var(--color-background-primary); border-radius: 36px; border: 0.5px solid var(--color-border-secondary); overflow: hidden; display: flex; flex-direction: column; }
+  .phone-notch { width: 100%; height: 36px; background: var(--color-background-primary); display: flex; align-items: center; justify-content: center; border-bottom: 0.5px solid var(--color-border-tertiary); flex-shrink: 0; }
+  .notch-pill { width: 80px; height: 8px; background: var(--color-border-secondary); border-radius: 999px; }
+  .screen { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+  .screen.active { display: flex; }
+
+  .wa-bg { flex: 1; background: #e8dfc8; display: flex; flex-direction: column; }
+  .wa-header { background: #1a5c45; padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
+  .wa-avatar { width: 36px; height: 36px; border-radius: 50%; background: #a8d5a2; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; color: #1a5c45; flex-shrink: 0; }
+  .wa-name { font-size: 14px; font-weight: 500; color: #fff; }
+  .wa-subtitle { font-size: 11px; color: rgba(255,255,255,0.65); }
+  .wa-body { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 10px; }
+  .wa-bubble { background: #fff; border-radius: 0 12px 12px 12px; padding: 10px 14px; max-width: 85%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); align-self: flex-start; }
+  .wa-bubble p { font-size: 13.5px; line-height: 1.55; color: #111; }
+  .wa-time { font-size: 10px; color: #888; text-align: right; margin-top: 4px; }
+  .wa-link { display: inline-block; margin-top: 8px; background: #1a5c45; color: #fff; font-size: 12.5px; font-weight: 500; padding: 8px 16px; border-radius: 999px; cursor: pointer; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: #aaa; animation: bounce 1.2s infinite; }
+  .dot:nth-child(2) { animation-delay: 0.2s; } .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-5px)} }
+
+  .hook-screen { flex: 1; background: #fdf7ef; display: flex; flex-direction: column; align-items: center; padding: 28px 24px 20px; text-align: center; overflow-y: auto; }
+  .hook-badge { width: 56px; height: 56px; background: #fff3e0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 16px; border: 1px solid #ffe0b2; }
+  .hook-eyebrow { font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: #b06e2a; margin-bottom: 8px; }
+  .hook-headline { font-family: 'Lora', serif; font-size: 21px; font-weight: 600; color: #2c1a0e; line-height: 1.35; margin-bottom: 8px; }
+  .hook-subtext { font-size: 13px; color: #7a6254; line-height: 1.6; margin-bottom: 24px; }
+  .stat-bar { display: flex; gap: 8px; margin-bottom: 16px; width: 100%; }
+  .stat-chip { flex: 1; background: #fff; border-radius: var(--border-radius-md); padding: 10px 12px; text-align: center; border: 0.5px solid #e0c9b0; }
+  .stat-num { font-family: 'Lora', serif; font-size: 20px; font-weight: 600; color: #c0622a; display: block; }
+  .stat-lbl { font-size: 10px; color: #9a7864; }
+  .city-pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-bottom: 20px; }
+  .city-pill { background: #fff; border: 0.5px solid #e0c9b0; border-radius: 999px; padding: 4px 12px; font-size: 12px; color: #5a3e2b; }
+
+  .profile-screen { flex: 1; background: var(--color-background-primary); display: flex; flex-direction: column; overflow: hidden; }
+  .profile-hero { background: #f9f2e8; padding: 16px 20px 14px; display: flex; flex-direction: column; align-items: center; text-align: center; border-bottom: 0.5px solid #e8d9c4; flex-shrink: 0; }
+  .profile-photo { width: 64px; height: 64px; border-radius: 50%; background: #d9c4a8; border: 3px solid #fff; display: flex; align-items: center; justify-content: center; font-family: 'Lora', serif; font-size: 22px; color: #5a3e2b; margin-bottom: 8px; }
+  .profile-name { font-family: 'Lora', serif; font-size: 16px; font-weight: 600; color: #2c1a0e; margin-bottom: 2px; }
+  .profile-meta { font-size: 11px; color: #9a7864; margin-bottom: 4px; }
+  .fetched-tag { font-size: 10px; background: #e8f5e9; color: #1a5c45; padding: 2px 8px; border-radius: 999px; border: 0.5px solid #a5d6a7; }
+  .progress-bar-wrap { padding: 10px 20px 0; flex-shrink: 0; }
+  .progress-track { height: 3px; background: var(--color-border-tertiary); border-radius: 999px; overflow: hidden; }
+  .progress-fill { height: 100%; background: #c0622a; border-radius: 999px; transition: width 0.3s ease; }
+  .progress-text { font-size: 10px; color: var(--color-text-tertiary); text-align: right; margin-top: 4px; }
+  .blocker-banner { display: none; margin: 8px 20px 0; background: #fff3e0; border: 0.5px solid #e0a060; border-radius: var(--border-radius-md); padding: 8px 12px; }
+  .blocker-banner p { font-size: 11.5px; color: #8b4a10; line-height: 1.5; }
+  .blocker-banner.visible { display: block; }
+  .profile-body { flex: 1; padding: 12px 20px; overflow-y: auto; }
+  .section-title { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-text-tertiary); margin-bottom: 6px; margin-top: 14px; }
+  .section-title:first-child { margin-top: 0; }
+
+  .erp-field { border-bottom: 0.5px solid var(--color-border-tertiary); padding: 10px 0; }
+  .erp-display { display: flex; align-items: center; gap: 10px; }
+  .erp-check { width: 20px; height: 20px; border-radius: 5px; border: 1.5px solid #c0622a; background: #fff; flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s, border-color 0.15s; }
+  .erp-check.confirmed { background: #c0622a; border-color: #c0622a; }
+  .erp-check svg { display: none; }
+  .erp-check.confirmed svg { display: block; }
+  .erp-info { flex: 1; min-width: 0; }
+  .erp-label { font-size: 11px; color: var(--color-text-secondary); }
+  .erp-value { font-size: 13px; color: var(--color-text-primary); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .erp-value.accent { color: #c0622a; }
+  .erp-value.edited { color: #1a5c45; }
+  .edit-btn { font-size: 11px; color: #c0622a; background: none; border: 0.5px solid #e0c9b0; border-radius: 999px; padding: 3px 10px; cursor: pointer; font-family: 'DM Sans', sans-serif; flex-shrink: 0; }
+  .erp-edit-row { display: none; margin-top: 8px; gap: 6px; align-items: center; }
+  .erp-edit-row.open { display: flex; }
+  .erp-edit-input { flex: 1; border: none; border-bottom: 1.5px solid #c0622a; background: transparent; font-size: 13px; color: var(--color-text-primary); padding: 3px 0 4px; font-family: 'DM Sans', sans-serif; outline: none; }
+  .erp-save-btn { font-size: 11px; font-weight: 500; color: #fff; background: #1a5c45; border: none; border-radius: 999px; padding: 4px 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .erp-cancel-btn { font-size: 11px; color: var(--color-text-secondary); background: none; border: 0.5px solid var(--color-border-secondary); border-radius: 999px; padding: 4px 10px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .edited-tag { display: none; font-size: 9px; color: #1a5c45; background: #e8f5e9; border: 0.5px solid #a5d6a7; border-radius: 999px; padding: 1px 6px; margin-left: 4px; vertical-align: middle; }
+  .edited-tag.show { display: inline; }
+
+  .missing-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .missing-icon { width: 20px; height: 20px; border-radius: 50%; background: #fff3e0; border: 1.5px solid #e0a060; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+  .missing-icon span { font-size: 10px; color: #c0622a; font-weight: 700; line-height: 1; }
+  .missing-input-wrap { flex: 1; }
+  .missing-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 2px; }
+  .missing-input { width: 100%; border: none; border-bottom: 1.5px solid #e0c9b0; background: transparent; font-size: 13px; color: var(--color-text-primary); padding: 2px 0 4px; font-family: 'DM Sans', sans-serif; outline: none; }
+  .missing-input:focus { border-bottom-color: #c0622a; }
+  .missing-input.filled { border-bottom-color: #1a5c45; }
+
+  .network-screen { flex: 1; background: var(--color-background-primary); display: flex; flex-direction: column; overflow: hidden; }
+  .network-header { padding: 20px 20px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); flex-shrink: 0; }
+  .network-title { font-family: 'Lora', serif; font-size: 16px; font-weight: 600; color: #2c1a0e; margin-bottom: 4px; }
+  .network-sub { font-size: 12px; color: var(--color-text-secondary); }
+  .network-body { flex: 1; padding: 16px 20px; overflow-y: auto; }
+  .company-group { margin-bottom: 14px; }
+  .company-name-h { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+  .company-name-h::after { content: ''; flex: 1; height: 0.5px; background: var(--color-border-tertiary); }
+  .alumni-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .alumni-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; flex-shrink: 0; }
+  .av-1{background:#fff3e0;color:#c0622a} .av-2{background:#e8f5e9;color:#1a5c45} .av-4{background:#fce4ec;color:#c2185b} .av-5{background:#e0f7fa;color:#0097a7}
+  .alumni-info { flex: 1; }
+  .alumni-name-t { font-size: 13px; color: var(--color-text-primary); font-weight: 500; }
+  .alumni-role-t { font-size: 11px; color: var(--color-text-secondary); }
+  .verified-dot { width: 7px; height: 7px; border-radius: 50%; background: #1a5c45; flex-shrink: 0; }
+
+  /* SCREEN 5 */
+  .badge-screen { flex: 1; background: #fdf7ef; display: flex; flex-direction: column; align-items: center; padding: 28px 24px 20px; text-align: center; overflow-y: auto; }
+  .badge-ring { width: 96px; height: 96px; border-radius: 50%; border: 3px solid #c0622a; display: flex; align-items: center; justify-content: center; margin-bottom: 18px; animation: popIn 0.5s ease; }
+  @keyframes popIn { 0%{transform:scale(0.5);opacity:0} 80%{transform:scale(1.08)} 100%{transform:scale(1);opacity:1} }
+  .badge-inner { width: 76px; height: 76px; border-radius: 50%; background: #c0622a; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+  .badge-check-icon { color: #fff; font-size: 22px; }
+  .badge-word { font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.85); }
+  .badge-eyebrow { font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: #b06e2a; margin-bottom: 8px; }
+  .badge-headline { font-family: 'Lora', serif; font-size: 20px; font-weight: 600; color: #2c1a0e; line-height: 1.4; margin-bottom: 10px; }
+  .badge-sub { font-size: 13px; color: #7a6254; line-height: 1.6; margin-bottom: 18px; }
+  .badge-card { width: 100%; background: #fff; border-radius: var(--border-radius-lg); border: 0.5px solid #e0c9b0; padding: 14px 16px; margin-bottom: 20px; text-align: left; }
+  .badge-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 0.5px solid #f0e4d4; gap: 8px; }
+  .badge-row:last-child { border-bottom: none; }
+  .badge-key { font-size: 11.5px; color: #9a7864; flex-shrink: 0; }
+  .badge-val { font-size: 11.5px; color: #2c1a0e; font-weight: 500; text-align: right; }
+  .share-btn { width: 100%; background: #1a1a1a; color: #fff; border: none; border-radius: 999px; padding: 12px 20px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; margin-bottom: 10px; }
+  .share-btn:hover { background: #333; }
+  .secondary-btn { width: 100%; background: #fff; color: #1a1a1a; border: 1.5px solid #1a1a1a; border-radius: 999px; padding: 11px 20px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .secondary-btn:hover { background: #f5f5f5; }
+
+  .nav-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px 14px; border-top: 0.5px solid var(--color-border-tertiary); background: var(--color-background-primary); flex-shrink: 0; }
+  .nav-back { font-size: 12px; color: var(--color-text-secondary); background: none; border: 0.5px solid var(--color-border-secondary); border-radius: 999px; padding: 6px 14px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .nav-next { font-size: 12px; font-weight: 500; color: #fff; background: #c0622a; border: none; border-radius: 999px; padding: 6px 16px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .nav-next.locked { background: #d9c4a8; color: #9a7864; cursor: not-allowed; }
+  .nav-dots { display: flex; gap: 5px; align-items: center; }
+  .nav-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-border-secondary); transition: all 0.2s; }
+  .nav-dot.active { background: #c0622a; width: 16px; border-radius: 999px; }
+  .progress-note { font-size: 11px; color: var(--color-text-tertiary); margin-top: 10px; text-align: center; }
+</style>
+
+<div class="proto-wrap">
+  <div class="screen-label" id="screenLabel">Screen 1 of 5 — WhatsApp notification</div>
+  <div class="phone">
+    <div class="phone-notch"><div class="notch-pill"></div></div>
+
+    <!-- S1 -->
+    <div class="screen active" id="s1">
+      <div class="wa-bg">
+        <div class="wa-header">
+          <div class="wa-avatar">E</div>
+          <div><div class="wa-name">edumerge Alumni</div><div class="wa-subtitle">Official college network</div></div>
+        </div>
+        <div class="wa-body">
+          <div style="display:flex;gap:4px;padding:8px 0;align-self:flex-start"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="wa-bubble">
+            <p>Hey Arjun 👋<br><br>Your 2021 batch is now spread across <strong>14 cities</strong> — Bengaluru, Mumbai, Singapore and more.</p>
+            <p style="margin-top:8px">See where your lab partners landed. It takes 30 seconds.</p>
+            <span class="wa-link" onclick="goTo(2)">See my batch →</span>
+            <div class="wa-time">10:42 AM</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S2 -->
+    <div class="screen" id="s2">
+      <div class="hook-screen">
+        <div class="hook-badge">🎓</div>
+        <div class="hook-eyebrow">PSIT, Kanpur · Batch of 2021</div>
+        <div class="hook-headline">Your batch has been busy since you left.</div>
+        <div class="hook-subtext">127 alumni from your graduating year are already on the network.</div>
+        <div class="stat-bar">
+          <div class="stat-chip"><span class="stat-num">127</span><span class="stat-lbl">alumni active</span></div>
+          <div class="stat-chip"><span class="stat-num">14</span><span class="stat-lbl">cities</span></div>
+          <div class="stat-chip"><span class="stat-num">38</span><span class="stat-lbl">companies</span></div>
+        </div>
+        <div class="city-pills">
+          <span class="city-pill">Bengaluru</span><span class="city-pill">Mumbai</span><span class="city-pill">Delhi NCR</span><span class="city-pill">Hyderabad</span><span class="city-pill">Singapore</span><span class="city-pill">+9 more</span>
+        </div>
+        <p style="font-size:12px;color:#9a7864;line-height:1.6">Your profile has been prepared from college records.<br>Confirm it in 30 seconds to unlock the full map.</p>
+      </div>
+    </div>
+
+    <!-- S3 -->
+    <div class="screen" id="s3">
+      <div class="profile-screen">
+        <div class="profile-hero">
+          <div class="profile-photo">AK</div>
+          <div class="profile-name">Arjun Kumar</div>
+          <div class="profile-meta">B.Tech Computer Science · 2021</div>
+          <div class="fetched-tag">Auto-filled from ERP — confirm or correct each field</div>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+          <div class="progress-text" id="progressText">0 of 7 fields confirmed</div>
+        </div>
+        <div class="blocker-banner" id="blockerBanner">
+          <p id="blockerMsg">Confirm all ERP fields and fill in the missing ones to continue.</p>
+        </div>
+        <div class="profile-body" id="profileBody">
+          <div class="section-title">Academic record — confirm or correct</div>
+
+          <div class="erp-field" id="field1">
+            <div class="erp-display">
+              <div class="erp-check" id="chk1" onclick="toggleConfirm(1)"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+              <div class="erp-info">
+                <div class="erp-label">CGPA</div>
+                <div class="erp-value accent" id="val1">8.4 / 10 <span class="edited-tag" id="etag1">edited</span></div>
+              </div>
+              <button class="edit-btn" id="ebtn1" onclick="openEdit(1)">Edit</button>
+            </div>
+            <div class="erp-edit-row" id="editrow1">
+              <input class="erp-edit-input" id="einp1" value="8.4 / 10" type="text">
+              <button class="erp-cancel-btn" onclick="cancelEdit(1)">Cancel</button>
+              <button class="erp-save-btn" onclick="saveEdit(1)">Save</button>
+            </div>
+          </div>
+
+          <div class="erp-field" id="field2">
+            <div class="erp-display">
+              <div class="erp-check" id="chk2" onclick="toggleConfirm(2)"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+              <div class="erp-info">
+                <div class="erp-label">Specialisation</div>
+                <div class="erp-value" id="val2">AI & Data Science <span class="edited-tag" id="etag2">edited</span></div>
+              </div>
+              <button class="edit-btn" id="ebtn2" onclick="openEdit(2)">Edit</button>
+            </div>
+            <div class="erp-edit-row" id="editrow2">
+              <input class="erp-edit-input" id="einp2" value="AI & Data Science" type="text">
+              <button class="erp-cancel-btn" onclick="cancelEdit(2)">Cancel</button>
+              <button class="erp-save-btn" onclick="saveEdit(2)">Save</button>
+            </div>
+          </div>
+
+          <div class="erp-field" id="field3">
+            <div class="erp-display">
+              <div class="erp-check" id="chk3" onclick="toggleConfirm(3)"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+              <div class="erp-info">
+                <div class="erp-label">Final project</div>
+                <div class="erp-value" id="val3">Traffic Flow Prediction using LSTM <span class="edited-tag" id="etag3">edited</span></div>
+              </div>
+              <button class="edit-btn" id="ebtn3" onclick="openEdit(3)">Edit</button>
+            </div>
+            <div class="erp-edit-row" id="editrow3">
+              <input class="erp-edit-input" id="einp3" value="Traffic Flow Prediction using LSTM" type="text">
+              <button class="erp-cancel-btn" onclick="cancelEdit(3)">Cancel</button>
+              <button class="erp-save-btn" onclick="saveEdit(3)">Save</button>
+            </div>
+          </div>
+
+          <div class="erp-field" id="field4">
+            <div class="erp-display">
+              <div class="erp-check" id="chk4" onclick="toggleConfirm(4)"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+              <div class="erp-info">
+                <div class="erp-label">Lab & supervisor</div>
+                <div class="erp-value" id="val4">Prof. R. Sharma · ML Lab <span class="edited-tag" id="etag4">edited</span></div>
+              </div>
+              <button class="edit-btn" id="ebtn4" onclick="openEdit(4)">Edit</button>
+            </div>
+            <div class="erp-edit-row" id="editrow4">
+              <input class="erp-edit-input" id="einp4" value="Prof. R. Sharma · ML Lab" type="text">
+              <button class="erp-cancel-btn" onclick="cancelEdit(4)">Cancel</button>
+              <button class="erp-save-btn" onclick="saveEdit(4)">Save</button>
+            </div>
+          </div>
+
+          <div class="section-title" style="margin-top:14px">Where are you now? — required to continue</div>
+          <div class="missing-row">
+            <div class="missing-icon" id="icon5"><span>!</span></div>
+            <div class="missing-input-wrap">
+              <div class="missing-label">Current role</div>
+              <input class="missing-input" id="inp5" type="text" placeholder="e.g. Software Engineer" oninput="checkMissing('inp5','icon5')">
+            </div>
+          </div>
+          <div class="missing-row">
+            <div class="missing-icon" id="icon6"><span>!</span></div>
+            <div class="missing-input-wrap">
+              <div class="missing-label">Company</div>
+              <input class="missing-input" id="inp6" type="text" placeholder="e.g. Razorpay" oninput="checkMissing('inp6','icon6')">
+            </div>
+          </div>
+          <div class="missing-row">
+            <div class="missing-icon" id="icon7"><span>!</span></div>
+            <div class="missing-input-wrap">
+              <div class="missing-label">City</div>
+              <input class="missing-input" id="inp7" type="text" placeholder="e.g. Bengaluru" oninput="checkMissing('inp7','icon7')">
+            </div>
+          </div>
+          <p style="font-size:11px;color:#9a7864;margin-top:14px;line-height:1.6;padding-bottom:8px">Tick to confirm a field is correct. If something's wrong, hit Edit — corrected fields are flagged so the college can review them.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- S4 -->
+    <div class="screen" id="s4">
+      <div class="network-screen">
+        <div class="network-header">
+          <div class="network-title">Your batch, mapped.</div>
+          <div class="network-sub">127 verified alumni from PSIT 2021</div>
+        </div>
+        <div class="network-body">
+          <div class="stat-bar">
+            <div class="stat-chip" style="background:var(--color-background-secondary);border:none"><span class="stat-num">23</span><span class="stat-lbl">product</span></div>
+            <div class="stat-chip" style="background:var(--color-background-secondary);border:none"><span class="stat-num">31</span><span class="stat-lbl">engineering</span></div>
+            <div class="stat-chip" style="background:var(--color-background-secondary);border:none"><span class="stat-num">18</span><span class="stat-lbl">data</span></div>
+          </div>
+          <div class="company-group">
+            <div class="company-name-h">Google</div>
+            <div class="alumni-row"><div class="alumni-avatar av-1">RK</div><div class="alumni-info"><div class="alumni-name-t">Riya Kapoor</div><div class="alumni-role-t">Software Engineer · Bengaluru</div></div><div class="verified-dot"></div></div>
+          </div>
+          <div class="company-group">
+            <div class="company-name-h">Razorpay</div>
+            <div class="alumni-row"><div class="alumni-avatar av-2">AM</div><div class="alumni-info"><div class="alumni-name-t">Aditya Mehta</div><div class="alumni-role-t">Product Manager · Bengaluru</div></div><div class="verified-dot"></div></div>
+            <div class="alumni-row"><div class="alumni-avatar av-5">PS</div><div class="alumni-info"><div class="alumni-name-t">Priya Sinha</div><div class="alumni-role-t">Data Analyst · Bengaluru</div></div><div class="verified-dot"></div></div>
+          </div>
+          <div class="company-group">
+            <div class="company-name-h">Grab · Singapore</div>
+            <div class="alumni-row"><div class="alumni-avatar av-4">SK</div><div class="alumni-info"><div class="alumni-name-t">Sneha Kulkarni</div><div class="alumni-role-t">ML Engineer · Singapore</div></div><div class="verified-dot"></div></div>
+          </div>
+          <p style="font-size:11px;color:var(--color-text-tertiary);text-align:center;padding:8px 0">Your profile is now live. Alumni can find you.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- S5 -->
+    <div class="screen" id="s5">
+      <div class="badge-screen">
+        <div class="badge-ring">
+          <div class="badge-inner">
+            <div class="badge-check-icon">✓</div>
+            <div class="badge-word">Verified</div>
+          </div>
+        </div>
+        <div class="badge-eyebrow">You're in</div>
+        <div class="badge-headline">Welcome back, Arjun.</div>
+        <div class="badge-sub">Your institutional record is verified. A credential no LinkedIn profile can replicate.</div>
+        <div class="badge-card">
+          <div class="badge-row"><span class="badge-key">Name</span><span class="badge-val">Arjun Kumar</span></div>
+          <div class="badge-row"><span class="badge-key">College</span><span class="badge-val">PSIT, Kanpur</span></div>
+          <div class="badge-row"><span class="badge-key">Batch</span><span class="badge-val">B.Tech CSE · 2021</span></div>
+          <div class="badge-row"><span class="badge-key">CGPA</span><span class="badge-val" id="badgeCGPA">8.4 / 10 · Confirmed</span></div>
+          <div class="badge-row"><span class="badge-key">Role</span><span class="badge-val" id="badgeRole">—</span></div>
+          <div class="badge-row"><span class="badge-key">Company</span><span class="badge-val" id="badgeCompany">—</span></div>
+          <div class="badge-row"><span class="badge-key">Issued by</span><span class="badge-val">edumerge ERP · 2025</span></div>
+        </div>
+        <button class="share-btn">Share on LinkedIn</button>
+        <button class="secondary-btn">Explore my batch network</button>
+      </div>
+    </div>
+
+    <div class="nav-bar" id="navBar" style="display:none">
+      <button class="nav-back" onclick="stepBack()">← Back</button>
+      <div class="nav-dots" id="dots"></div>
+      <button class="nav-next locked" id="nextBtn" onclick="tryNext()">Next →</button>
+    </div>
+  </div>
+  <div class="progress-note" id="progressNote">Tap "See my batch →" to begin the onboarding flow</div>
+</div>
+
+<script>
+  const screens=['s1','s2','s3','s4','s5'];
+  const labels=['Screen 1 of 5 — WhatsApp notification','Screen 2 of 5 — Nostalgia hook','Screen 3 of 5 — Profile confirmation','Screen 4 of 5 — Batch network preview','Screen 5 of 5 — Verified badge reveal'];
+  const notes=['Tap "See my batch →" to begin','Low-friction hook — no login yet','Confirm ERP data (edit if wrong) + fill missing fields','The payoff: your batch mapped by company','The verified badge — the trust moat made tangible'];
+  let cur=0;
+  const confirmed={1:false,2:false,3:false,4:false};
+  const edited={1:false,2:false,3:false,4:false};
+  const editOpen={1:false,2:false,3:false,4:false};
+  const missingFilled={5:false,6:false,7:false};
+
+  function openEdit(n){
+    if(confirmed[n]){confirmed[n]=false;document.getElementById('chk'+n).classList.remove('confirmed');updateProgress();}
+    editOpen[n]=true;
+    document.getElementById('editrow'+n).classList.add('open');
+    document.getElementById('ebtn'+n).style.display='none';
+    document.getElementById('einp'+n).focus();
+  }
+  function cancelEdit(n){
+    editOpen[n]=false;
+    document.getElementById('editrow'+n).classList.remove('open');
+    document.getElementById('ebtn'+n).style.display='';
+  }
+  function saveEdit(n){
+    const v=document.getElementById('einp'+n).value.trim();
+    if(!v)return;
+    const valEl=document.getElementById('val'+n);
+    const tag=document.getElementById('etag'+n);
+    valEl.childNodes[0].textContent=v+' ';
+    edited[n]=true;tag.classList.add('show');
+    valEl.className=n===1?'erp-value accent edited':'erp-value edited';
+    cancelEdit(n);confirmed[n]=false;
+    document.getElementById('chk'+n).classList.remove('confirmed');
+    updateProgress();
+  }
+  function toggleConfirm(n){
+    if(editOpen[n])return;
+    confirmed[n]=!confirmed[n];
+    document.getElementById('chk'+n).classList.toggle('confirmed',confirmed[n]);
+    updateProgress();
+  }
+  function checkMissing(inputId,iconId){
+    const idx=parseInt(inputId.replace('inp',''));
+    const val=document.getElementById(inputId).value.trim();
+    missingFilled[idx]=val.length>0;
+    document.getElementById(inputId).classList.toggle('filled',missingFilled[idx]);
+    const icon=document.getElementById(iconId);
+    if(missingFilled[idx]){
+      icon.style.background='#e8f5e9';icon.style.borderColor='#a5d6a7';
+      icon.innerHTML='<svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 5l2 2 4-4" stroke="#1a5c45" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
+    } else {
+      icon.style.background='#fff3e0';icon.style.borderColor='#e0a060';
+      icon.innerHTML='<span style="font-size:10px;color:#c0622a;font-weight:700;line-height:1">!</span>';
+    }
+    updateProgress();
+  }
+  function countDone(){return Object.values(confirmed).filter(Boolean).length+Object.values(missingFilled).filter(Boolean).length;}
+  function isComplete(){return Object.values(confirmed).every(Boolean)&&Object.values(missingFilled).every(Boolean);}
+  function updateProgress(){
+    if(cur!==2)return;
+    const done=countDone(),total=7;
+    document.getElementById('progressFill').style.width=Math.round(done/total*100)+'%';
+    document.getElementById('progressText').textContent=done+' of '+total+' fields confirmed';
+    const ok=isComplete();
+    document.getElementById('nextBtn').classList.toggle('locked',!ok);
+    const banner=document.getElementById('blockerBanner');
+    if(!ok){
+      banner.classList.add('visible');
+      const m=[];
+      if(!Object.values(confirmed).every(Boolean))m.push('confirm (or edit & confirm) all ERP fields');
+      if(!Object.values(missingFilled).every(Boolean))m.push('fill in the 3 missing fields');
+      document.getElementById('blockerMsg').textContent='Still needed: '+m.join(', and ')+'.';
+    } else {banner.classList.remove('visible');}
+  }
+  function renderDots(){
+    const d=document.getElementById('dots');d.innerHTML='';
+    for(let i=1;i<5;i++){const el=document.createElement('div');el.className='nav-dot'+(i===cur?' active':'');d.appendChild(el);}
+  }
+  function goTo(n){
+    document.getElementById(screens[cur]).classList.remove('active');
+    cur=n;
+    document.getElementById(screens[cur]).classList.add('active');
+    document.getElementById('screenLabel').textContent=labels[cur];
+    document.getElementById('progressNote').textContent=notes[cur];
+    document.getElementById('navBar').style.display=cur===0?'none':'flex';
+    const btn=document.getElementById('nextBtn');
+    btn.style.display=cur===4?'none':'';
+    if(cur===2){updateProgress();}else{btn.classList.remove('locked');}
+    if(cur===4){
+      const role=document.getElementById('inp5').value.trim();
+      const co=document.getElementById('inp6').value.trim();
+      const cgpa=document.getElementById('einp1').value.trim();
+      if(role)document.getElementById('badgeRole').textContent=role;
+      if(co)document.getElementById('badgeCompany').textContent=co;
+      if(cgpa)document.getElementById('badgeCGPA').textContent=cgpa+(edited[1]?' · Edited & confirmed':' · Confirmed');
+    }
+    renderDots();
+  }
+  function tryNext(){
+    if(cur===2&&!isComplete()){document.getElementById('blockerBanner').classList.add('visible');document.getElementById('profileBody').scrollTop=0;return;}
+    if(cur<4)goTo(cur+1);
+  }
+  function stepBack(){if(cur>1)goTo(cur-1);}
+  renderDots();
+</script>
